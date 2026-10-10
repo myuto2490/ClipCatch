@@ -79,6 +79,13 @@ class TestDownloadArguments:
         assert option_value(args, "--cookies-from-browser") == "firefox"
         assert "--ignore-config" not in args
 
+    def test_js_runtime(self):
+        args = ytdlp.download_arguments(make_request(js_runtime=Path("/bin/deno")))
+        assert option_value(args, "--js-runtimes") == f"deno:{Path('/bin/deno')}"
+        assert "--js-runtimes" not in ytdlp.download_arguments(make_request())
+        meta = ytdlp.metadata_arguments("u", js_runtime=Path("/bin/deno"))
+        assert option_value(meta, "--js-runtimes") == f"deno:{Path('/bin/deno')}"
+
     def test_playlist(self):
         args = ytdlp.download_arguments(make_request(allow_playlist=True))
         assert "--yes-playlist" in args
@@ -228,6 +235,14 @@ class TestOutputParser:
         (error,) = parser.feed("ERROR: Video unavailable")
         assert error.level is LogLevel.ERROR
         assert parser.last_error == "Video unavailable"
+
+        for noise in (
+            "*** Download Progress Summary as of Sat Oct 10 14:52:08 2026 ***",
+            "=" * 79,
+            "-" * 79,
+            "FILE: /out/Clip.f140.m4a.part",
+        ):
+            assert parser.feed(noise) == []
 
         parser.feed(RESULT_MARKER + SEPARATOR.join(["T", "NA", "NA", "/out/T.mp4"]))
         assert parser.result.file_path == "/out/T.mp4"
