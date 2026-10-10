@@ -7,14 +7,29 @@ each distributed under its own license.
 
 | Software | License | Project |
 | --- | --- | --- |
-| Qt for Python (PySide6) and Qt 6 | LGPL-3.0 | https://www.qt.io/qt-for-python |
-| Python | PSF License | https://www.python.org |
-| PyInstaller bootloader | GPL-2.0 with a special exception allowing distribution of bundled apps | https://pyinstaller.org |
+| Qt for Python (PySide6, Shiboken6) and Qt 6 | LGPL-3.0-only | https://www.qt.io/qt-for-python |
+| Python and the libraries in its standard distribution | PSF-2.0 and others (see `Python-LICENSE.txt`) | https://www.python.org |
+| PyInstaller bootloader | GPL-2.0-or-later with an exception that allows distributing bundled apps under any license | https://pyinstaller.org |
 
-Qt and PySide6 are used under the GNU Lesser General Public License v3. ClipCatch is distributed in a
-"one-folder" layout, so the Qt and PySide6 libraries inside the application can be replaced with your own
-builds. The source code of Qt and PySide6 is available from https://download.qt.io/official_releases/ and
-https://code.qt.io/.
+Every release package contains a `licenses` folder with the full license texts:
+
+| File | Contents |
+| --- | --- |
+| `LICENSE` | ClipCatch (MIT) |
+| `THIRD_PARTY_NOTICES.md` | This document |
+| `LGPL-3.0-only.txt`, `GPL-3.0-only.txt` | GNU LGPL v3 and the GNU GPL v3 it builds on (Qt / PySide6) |
+| `Python-LICENSE.txt` | The license file shipped with the Python runtime used for the build |
+
+On macOS the folder is inside `ClipCatch.app/Contents/Resources/`; on Windows it is in the `_internal`
+folder next to `ClipCatch.exe`. You can also open it from **About ClipCatch › Open Source Licenses**.
+
+### Qt and PySide6 (LGPL-3.0)
+
+ClipCatch uses Qt and PySide6 as dynamically linked libraries and does not modify them. Release packages use
+a "one-folder" layout, so you can replace the Qt and PySide6 libraries inside the application with your own
+compatible builds. The corresponding source code is available from https://download.qt.io/official_releases/
+and https://code.qt.io/. The ClipCatch source code needed to rebuild the application is available in this
+repository.
 
 ## Downloaded at runtime (not bundled)
 

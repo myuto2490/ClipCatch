@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,7 @@ name = "clipcatch"
 description = "Save video and audio from a URL — a cross-platform desktop app powered by yt-dlp."
 readme = "README.md"
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "LICENSES/*.txt", "THIRD_PARTY_NOTICES.md"]
 authors = [{ name = "myuto2490" }]
 requires-python = ">=3.10"
 dependencies = ["PySide6-Essentials>=6.8"]

@@ -216,5 +216,6 @@ ClipCatch は私的利用の範囲でお使いください。ダウンロード�
 
 [MIT License](LICENSE) © 2026 myuto2490
 
-ClipCatch が利用・取得するソフトウェアのライセンスは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) にまとめています。
+ClipCatch が同梱・取得するソフトウェアのライセンスは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) にまとめています。
+配布物には Qt / PySide6（LGPL-3.0）などのライセンス全文を同梱しており、「ClipCatch について › オープンソースライセンス」から確認できます。
 README のスクリーンショットには Blender Foundation の『Big Buck Bunny』（CC BY 3.0）を使用しています。

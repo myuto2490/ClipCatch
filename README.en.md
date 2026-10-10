@@ -146,5 +146,6 @@ service of the sites you download from.
 
 [MIT License](LICENSE) © 2026 myuto2490
 
-Licenses of the software ClipCatch uses or downloads are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Licenses of the software ClipCatch bundles or downloads are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Release packages include the full license texts (such as LGPL-3.0 for Qt / PySide6); open them from **About ClipCatch › Open Source Licenses**.
 The README screenshots show *Big Buck Bunny* by the Blender Foundation (CC BY 3.0).
