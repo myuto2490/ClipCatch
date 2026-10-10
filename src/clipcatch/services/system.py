@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import re
 import subprocess
+import sys
 from pathlib import Path
 
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QProcess, QUrl
 from PySide6.QtGui import QDesktopServices, QGuiApplication
 
 from clipcatch.core.platform import IS_MACOS, IS_WINDOWS
@@ -48,3 +49,21 @@ def reveal_file(path: Path) -> bool:
         subprocess.Popen(f'explorer /select,"{path}"')
         return True
     return open_folder(path.parent)
+
+
+def relaunch() -> bool:
+    """同じアプリをもう 1 つ起動する。呼び出し側は直後に終了すること。
+
+    macOS の .app は `open -n` で開き直し、Dock やメニューバーが正しく切り替わるようにする。
+    """
+    if getattr(sys, "frozen", False):
+        executable = Path(sys.executable).resolve()
+        if IS_MACOS and executable.parent.name == "MacOS":
+            program, arguments = "/usr/bin/open", ["-n", str(executable.parents[2])]
+        else:
+            program, arguments = str(executable), []
+    else:
+        program, arguments = sys.executable, ["-m", "clipcatch"]
+    result = QProcess.startDetached(program, arguments)
+    # PySide6 のバージョンによって bool か (bool, pid) が返る
+    return bool(result[0] if isinstance(result, tuple) else result)

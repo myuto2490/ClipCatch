@@ -36,7 +36,7 @@ See the [**Wiki**](https://github.com/myuto2490/ClipCatch/wiki/English) for deta
 - **Catches broken files** — after saving, ClipCatch checks the video track and warns you if it ends early
 - **Faster downloads** — uses [aria2](https://aria2.github.io) for parallel connections when available (great for bilibili)
 - **Same experience on macOS and Windows** — designed after Apple's [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/); follows your system's light/dark mode and accent color
-- **English and Japanese** — matches your system language
+- **English and Japanese** — follows your system language by default, or choose one in Settings
 
 ## Download
 

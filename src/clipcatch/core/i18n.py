@@ -33,6 +33,16 @@ def detect_language(preferred: list[str] | None = None) -> str:
     return "en"
 
 
+SYSTEM = "system"
+
+
+def resolve(setting: str | None, preferred: list[str] | None = None) -> str:
+    """設定（`system` / `ja` / `en`）から実際に使う言語を決める。"""
+    if setting in SUPPORTED:
+        return setting
+    return detect_language(preferred)
+
+
 def set_language(language: str) -> None:
     global _language
     _language = language if language in SUPPORTED else "en"

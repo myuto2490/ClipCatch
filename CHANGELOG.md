@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- 設定で表示する言語（システムに合わせる / 日本語 / English）を選べるようにした
+
 ## [0.1.0] - 2026-10-10
 
 最初の公開版です。[VideoDownloader](https://github.com/myuto2490/VideoDownloader) の macOS 版（Swift）の機能を
