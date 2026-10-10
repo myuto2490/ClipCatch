@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Wiki（使い方・トラブルシューティング）/ Wiki
+    url: https://github.com/myuto2490/ClipCatch/wiki
+    about: 報告の前に解決方法を確認できます / Check common fixes first
   - name: yt-dlp の対応サイト / Sites supported by yt-dlp
     url: https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md
     about: ダウンロードできるサイトの一覧 / List of supported sites
