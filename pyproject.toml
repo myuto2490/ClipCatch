@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clipcatch"
+description = "Save video and audio from a URL — a cross-platform desktop app powered by yt-dlp."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "myuto2490" }]
+requires-python = ">=3.10"
+dependencies = ["PySide6-Essentials>=6.8"]
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: MacOS X",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: End Users/Desktop",
+    "Natural Language :: English",
+    "Natural Language :: Japanese",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Video",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "pyinstaller>=6.10", "pillow>=10"]
+
+[project.urls]
+Homepage = "https://github.com/myuto2490/ClipCatch"
+Issues = "https://github.com/myuto2490/ClipCatch/issues"
+
+[project.gui-scripts]
+clipcatch = "clipcatch.__main__:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "clipcatch.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+clipcatch = ["assets/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+# 日本語の UI 文字列に全角記号を使うため
+ignore = ["RUF001", "RUF002", "RUF003"]
