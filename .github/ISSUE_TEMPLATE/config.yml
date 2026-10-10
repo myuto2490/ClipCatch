@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: yt-dlp の対応サイト / Sites supported by yt-dlp
+    url: https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md
+    about: ダウンロードできるサイトの一覧 / List of supported sites
+  - name: セキュリティの問題 / Security issue
+    url: https://github.com/myuto2490/ClipCatch/security/advisories/new
+    about: 脆弱性は非公開で報告してください / Please report vulnerabilities privately

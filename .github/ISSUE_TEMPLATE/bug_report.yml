@@ -1,0 +1,51 @@
+name: 不具合の報告 / Bug report
+description: 期待どおりに動かないときに報告してください / Report something that doesn't work
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        報告の前に、右上のメニューから yt-dlp を最新版に更新して再度試してください。
+        Before reporting, please update yt-dlp from the menu in the top-right corner and try again.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 何が起きましたか / What happened?
+      description: 期待した動作と実際の動作 / What you expected and what actually happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順 / Steps to reproduce
+      placeholder: |
+        1. URL: https://...
+        2. 形式 / Format: MP4
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: ClipCatch のバージョン / ClipCatch version
+      description: 「ClipCatch について」に表示されます / Shown in About ClipCatch
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - macOS (Apple silicon)
+        - macOS (Intel)
+        - Windows 11
+        - Windows 10
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: ログ / Log
+      description: アプリ下部の「ログ」の内容。Cookie などの個人情報は消してください / Contents of the Log panel. Remove any personal data.
+      render: text

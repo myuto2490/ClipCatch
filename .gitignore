@@ -21,6 +21,3 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/launch.json
-
-# PyInstaller
-*.spec.bak
