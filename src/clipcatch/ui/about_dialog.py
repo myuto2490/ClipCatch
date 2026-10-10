@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLa
 from clipcatch import APP_NAME, REPOSITORY, __version__
 from clipcatch.core.i18n import tr
 from clipcatch.services import system
-from clipcatch.ui.resources import app_icon
+from clipcatch.ui.resources import app_icon, licenses_directory
 from clipcatch.ui.widgets import label
 
 
@@ -50,14 +50,14 @@ class AboutDialog(QDialog):
 
         links = QHBoxLayout()
         links.addStretch()
-        for text, url in (
-            ("GitHub", f"https://github.com/{REPOSITORY}"),
-            (tr("ライセンス", "License"), f"https://github.com/{REPOSITORY}/blob/main/LICENSE"),
+        for text, action in (
+            ("GitHub", lambda: system.open_url(f"https://github.com/{REPOSITORY}")),
+            (tr("オープンソースライセンス", "Open Source Licenses"), self._open_licenses),
         ):
             button = QPushButton(text)
             button.setObjectName("link")
             button.setCursor(Qt.CursorShape.PointingHandCursor)
-            button.clicked.connect(lambda _=False, u=url: system.open_url(u))
+            button.clicked.connect(action)
             links.addWidget(button)
         links.addStretch()
 
@@ -74,3 +74,10 @@ class AboutDialog(QDialog):
         layout.addWidget(credits)
         layout.addLayout(links)
         layout.addWidget(copyright_)
+
+    @staticmethod
+    def _open_licenses() -> None:
+        """同梱のライセンス文書を開く。見つからなければ GitHub の一覧を開く。"""
+        directory = licenses_directory()
+        if directory is None or not system.open_folder(directory):
+            system.open_url(f"https://github.com/{REPOSITORY}/blob/main/THIRD_PARTY_NOTICES.md")

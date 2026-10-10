@@ -2,10 +2,11 @@
 
 このプロジェクトの変更点を記録します。書式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に、
 バージョンは [Semantic Versioning](https://semver.org/lang/ja/) に従います。
+1.0.0 に達するまでは、マイナーバージョン（0.x）の更新で設定や動作が変わることがあります。
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-10-10
+## [0.1.0] - 2026-10-10
 
 最初の公開版です。[VideoDownloader](https://github.com/myuto2490/VideoDownloader) の macOS 版（Swift）の機能を
 引き継ぎ、Python と Qt で macOS と Windows の両方に対応させました。
@@ -24,5 +25,5 @@
 - ライト／ダークとアクセントカラーへの追従、日本語と英語の表示
 - macOS 用 .dmg（Apple シリコン / Intel）と Windows 用インストーラ・ポータブル版
 
-[Unreleased]: https://github.com/myuto2490/ClipCatch/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/myuto2490/ClipCatch/releases/tag/v1.0.0
+[Unreleased]: https://github.com/myuto2490/ClipCatch/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/myuto2490/ClipCatch/releases/tag/v0.1.0

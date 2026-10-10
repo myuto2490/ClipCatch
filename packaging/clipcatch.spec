@@ -7,6 +7,7 @@
 import os
 import re
 import sys
+import sysconfig
 from pathlib import Path
 
 ROOT = Path(SPECPATH).parent  # noqa: F821 (PyInstaller が定義する)
@@ -40,10 +41,28 @@ EXCLUDES = [
     "PySide6.QtOpenGLWidgets",
 ]
 
+# 配布物に同梱するライセンス文書。LGPL-3.0（Qt / PySide6）は、ライブラリと一緒に
+# LGPL と GPL の全文を渡すことを求めている。Python 本体のライセンスは、ビルドに使った
+# インタプリタに付属するもの（同梱ライブラリの表示を含む）をそのまま入れる。
+LICENSE_STAGING = Path(workpath) / "licenses"  # noqa: F821
+LICENSE_STAGING.mkdir(parents=True, exist_ok=True)
+for source in [
+    ROOT / "LICENSE",
+    ROOT / "THIRD_PARTY_NOTICES.md",
+    *sorted((ROOT / "LICENSES").glob("*.txt")),
+]:
+    (LICENSE_STAGING / source.name).write_bytes(source.read_bytes())
+python_license = Path(sysconfig.get_paths()["stdlib"]) / "LICENSE.txt"
+if python_license.exists():
+    (LICENSE_STAGING / "Python-LICENSE.txt").write_bytes(python_license.read_bytes())
+
 a = Analysis(  # noqa: F821
     [str(ROOT / "packaging" / "entry.py")],
     pathex=[str(SRC)],
-    datas=[(str(SRC / "clipcatch" / "assets"), "clipcatch/assets")],
+    datas=[
+        (str(SRC / "clipcatch" / "assets"), "clipcatch/assets"),
+        (str(LICENSE_STAGING), "licenses"),
+    ],
     hiddenimports=["PySide6.QtSvg"],
     excludes=EXCLUDES,
     noarchive=False,

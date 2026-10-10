@@ -12,6 +12,9 @@
 更新してみてください。それでも直らない場合は、[yt-dlp](https://github.com/yt-dlp/yt-dlp/issues) 側の
 問題であることが多いです。
 
+設計やリリース手順の詳細は Wiki の [アーキテクチャ](https://github.com/myuto2490/ClipCatch/wiki/アーキテクチャ)・
+[ビルドとリリース](https://github.com/myuto2490/ClipCatch/wiki/ビルドとリリース) を参照してください。
+
 ## 開発の流れ
 
 ブランチは次のように使います。

@@ -25,6 +25,8 @@
   </picture>
 </p>
 
+詳しい使い方やトラブルシューティングは [**Wiki**](https://github.com/myuto2490/ClipCatch/wiki) にまとめています。
+
 ## 特徴
 
 - **貼る前に中身がわかる** — URL を入れると、サムネイル・タイトル・投稿者・再生時間をカードで表示します
@@ -173,7 +175,7 @@ Developer ID で署名・公証する場合は `MACOS_SIGN_IDENTITY` と `MACOS_
 ### リリース
 
 1. `src/clipcatch/__init__.py` の `__version__` と [CHANGELOG.md](CHANGELOG.md) を更新する
-2. `v<バージョン>` のタグを push する（例: `git tag v1.0.0 && git push origin v1.0.0`）
+2. `v<バージョン>` のタグを push する（例: `git tag v0.1.0 && git push origin v0.1.0`）
 3. GitHub Actions が Apple シリコン・Intel・Windows 向けの配布物を作り、**下書きのリリース**に添付する
 4. 内容を確認して公開する
 
@@ -216,5 +218,6 @@ ClipCatch は私的利用の範囲でお使いください。ダウンロード�
 
 [MIT License](LICENSE) © 2026 myuto2490
 
-ClipCatch が利用・取得するソフトウェアのライセンスは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) にまとめています。
+ClipCatch が同梱・取得するソフトウェアのライセンスは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) にまとめています。
+配布物には Qt / PySide6（LGPL-3.0）などのライセンス全文を同梱しており、「ClipCatch について › オープンソースライセンス」から確認できます。
 README のスクリーンショットには Blender Foundation の『Big Buck Bunny』（CC BY 3.0）を使用しています。
