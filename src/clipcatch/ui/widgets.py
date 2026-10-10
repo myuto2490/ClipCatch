@@ -269,8 +269,9 @@ class SegmentedControl(QWidget):
             font = self.font()
             font.setWeight(font.Weight.DemiBold if i == self._index else font.Weight.Normal)
             painter.setFont(font)
-            color = p.label if self.isEnabled() else p.tertiary
-            painter.setPen(QColor(color))
+            # 無効時も選択中の項目だけは読めるようにする（ダークでピルと同化しないよう）
+            dimmed = p.secondary if i == self._index else p.tertiary
+            painter.setPen(QColor(p.label if self.isEnabled() else dimmed))
             painter.drawText(segment, Qt.AlignmentFlag.AlignCenter, text)
 
         if self.hasFocus():
@@ -457,25 +458,34 @@ class Spinner(QWidget):
             painter.rotate(30)
 
 
-class Badge(QLabel):
-    """再生時間やサイト名を示す小さなラベル。"""
+class Badge(QWidget):
+    """再生時間やサイト名を示す小さなカプセル型のラベル。"""
 
     def __init__(self, text: str, tint: str = "secondary") -> None:
-        super().__init__(text)
+        super().__init__()
+        self._text = text
         self._tint = tint
-        self.refresh()
-        theme.notifier().changed.connect(self.refresh)
+        font = self.font()
+        font.setPointSizeF(max(font.pointSizeF() * 0.85, 9))
+        font.setWeight(font.Weight.Medium)
+        self.setFont(font)
+        metrics = QFontMetrics(font)
+        self.setFixedSize(metrics.horizontalAdvance(text) + 16, metrics.height() + 4)
+        theme.notifier().changed.connect(self.update)
 
-    def refresh(self) -> None:
+    def text(self) -> str:
+        return self._text
+
+    def paintEvent(self, _event: QPaintEvent) -> None:
         p = theme.current()
-        color = QColor(getattr(p, self._tint))
-        bg = QColor(color)
-        bg.setAlphaF(0.13)
-        self.setStyleSheet(
-            f"color: {color.name()}; background: rgba({bg.red()},{bg.green()},{bg.blue()},"
-            f"{bg.alphaF():.2f}); border-radius: 8px; padding: 1px 7px; font-size: 11px;"
-            "font-weight: 500;"
-        )
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        rect = QRectF(self.rect())
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(p.color(self._tint, 0.14))
+        painter.drawRoundedRect(rect, rect.height() / 2, rect.height() / 2)
+        painter.setPen(p.color(self._tint))
+        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, self._text)
 
 
 class Thumbnail(QWidget):
