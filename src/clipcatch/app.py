@@ -54,9 +54,10 @@ def run(argv: list[str]) -> int:
     app.setStyle("Fusion")  # スタイルシートを両 OS で同じように効かせるため
     app.setApplicationDisplayName(APP_NAME)
 
-    # 言語は OS の設定に従う（日本語以外は英語）
-    languages = QLocale.system().uiLanguages()
-    i18n.set_language(i18n.detect_language(languages))
+    # 言語は設定に従う。「システムに合わせる」なら OS の設定（日本語以外は英語）
+    from clipcatch.services.settings import Settings
+
+    i18n.set_language(i18n.resolve(Settings().language, QLocale.system().uiLanguages()))
 
     # 画面を作る前に言語と配色を決める
     from clipcatch.controller import AppController

@@ -36,7 +36,7 @@
 - **壊れたファイルに気づける** — 保存後に映像の長さを検査し、途中で映像が途切れていれば知らせます
 - **高速ダウンロード** — [aria2](https://aria2.github.io) があれば多重接続で取得します（bilibili などで効果大）
 - **macOS と Windows で同じ操作感** — [Apple Human Interface Guidelines](https://developer.apple.com/jp/design/human-interface-guidelines/) を参考にしたデザイン。ライト／ダークとアクセントカラーは OS の設定に従います
-- **日本語と英語** — OS の言語設定に合わせて切り替わります
+- **日本語と英語** — 既定では OS の言語設定に合わせ、設定で切り替えることもできます
 
 ## ダウンロード
 
@@ -101,6 +101,7 @@ xattr -dr com.apple.quarantine /Applications/ClipCatch.app
 - 完了したら Finder / エクスプローラーで表示
 - クリップボードの URL を自動で入力
 - 完了を知らせる（別のアプリを使っているとき）
+- 表示する言語（システムに合わせる / 日本語 / English。再起動後に反映）
 - aria2c で高速ダウンロード
 - ブラウザの Cookie を使う（ログインが必要な動画や画質のため）
 - プレイリストはすべて保存

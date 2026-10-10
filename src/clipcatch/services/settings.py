@@ -84,6 +84,16 @@ class Settings(QObject):
         self._write("quality", value)
 
     @property
+    def language(self) -> str:
+        """表示する言語。`system` なら OS の設定に従う。反映は次回の起動から。"""
+        value = str(self._store.value("language", "system"))
+        return value if value in ("system", "ja", "en") else "system"
+
+    @language.setter
+    def language(self, value: str) -> None:
+        self._write("language", value if value in ("system", "ja", "en") else "system")
+
+    @property
     def cookie_browser(self) -> CookieBrowser:
         value = self._enum("cookieBrowser", CookieBrowser, CookieBrowser.NONE)
         return value if value in CookieBrowser.available() else CookieBrowser.NONE

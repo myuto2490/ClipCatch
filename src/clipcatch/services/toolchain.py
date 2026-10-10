@@ -410,14 +410,42 @@ class Toolchain(QObject):
                 remove_quarantine(tools_directory() / name)
             self._install_archives(archives, tool, on_done, index + 1)
 
-        def downloaded(error: str | None) -> None:
-            if error:
-                on_done(error)
-                return
+        def extract() -> None:
             run_in_background(
                 lambda: extract_executables(staged, list(source.members), tools_directory()),
                 extracted,
             )
+
+        def verify(checksums: bytes | None, error: str | None) -> None:
+            text = checksums.decode("utf-8", "replace") if checksums else ""
+            expected = sources.parse_checksums(text).get(source.asset_name)
+            if expected is None:
+                staged.unlink(missing_ok=True)
+                on_done(
+                    error or tr("チェックサムを確認できませんでした。", "Checksum unavailable.")
+                )
+                return
+
+            def compared(actual: str | None, exc: BaseException | None) -> None:
+                if exc is not None or actual != expected:
+                    staged.unlink(missing_ok=True)
+                    on_done(
+                        str(exc)
+                        if exc
+                        else tr("チェックサムが一致しません。", "Checksum mismatch.")
+                    )
+                else:
+                    extract()
+
+            run_in_background(lambda: sha256(staged), compared)
+
+        def downloaded(error: str | None) -> None:
+            if error:
+                on_done(error)
+            elif source.checksum_url:
+                network.fetch(source.checksum_url, verify)
+            else:
+                extract()
 
         network.download_file(
             source.url,

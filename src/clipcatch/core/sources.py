@@ -22,6 +22,12 @@ class ArchiveSource:
 
     url: str
     members: tuple[str, ...]
+    # 配布元が公開している SHA-256 の一覧。あれば照合してから展開する。
+    checksum_url: str | None = None
+
+    @property
+    def asset_name(self) -> str:
+        return self.url.rsplit("/", 1)[-1]
 
 
 def ytdlp_download_url(system_machine: str | None = None) -> str:
@@ -55,10 +61,10 @@ def ffmpeg_sources(system_machine: str | None = None) -> list[list[ArchiveSource
     if IS_WINDOWS:
         name = "winarm64" if arch == "arm64" else "win64"
         url = _FFMPEG_BUILDS + f"ffmpeg-master-latest-{name}-gpl.zip"
-        return [[ArchiveSource(url, (ffmpeg, ffprobe))]]
+        return [[ArchiveSource(url, (ffmpeg, ffprobe), _FFMPEG_BUILDS + "checksums.sha256")]]
     name = "linuxarm64" if arch == "arm64" else "linux64"
     url = _FFMPEG_BUILDS + f"ffmpeg-master-latest-{name}-gpl.tar.xz"
-    return [[ArchiveSource(url, (ffmpeg, ffprobe))]]
+    return [[ArchiveSource(url, (ffmpeg, ffprobe), _FFMPEG_BUILDS + "checksums.sha256")]]
 
 
 def deno_source(system_machine: str | None = None) -> ArchiveSource:
@@ -71,7 +77,7 @@ def deno_source(system_machine: str | None = None) -> ArchiveSource:
     else:
         target = f"{arch}-unknown-linux-gnu"
     url = f"https://github.com/denoland/deno/releases/latest/download/deno-{target}.zip"
-    return ArchiveSource(url, (executable_name("deno"),))
+    return ArchiveSource(url, (executable_name("deno"),), url + ".sha256sum")
 
 
 def aria2_asset_name_matches(name: str, system_machine: str | None = None) -> bool:

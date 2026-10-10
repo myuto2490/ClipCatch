@@ -20,6 +20,12 @@ class TestI18n:
         i18n.set_language("ja")
         assert i18n.tr("日本語", "English") == "日本語"
 
+    def test_resolve_setting(self):
+        assert i18n.resolve("ja", ["en-US"]) == "ja"
+        assert i18n.resolve("en", ["ja-JP"]) == "en"
+        assert i18n.resolve("system", ["ja-JP"]) == "ja"
+        assert i18n.resolve("bogus", ["ja-JP"]) == "ja"
+
     def test_unknown_language_falls_back_to_english(self):
         i18n.set_language("fr")
         assert i18n.language() == "en"
