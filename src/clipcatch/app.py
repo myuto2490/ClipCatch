@@ -36,7 +36,7 @@ def self_test(app: QApplication, window) -> int:
 
 def run(argv: list[str]) -> int:
     QCoreApplication.setOrganizationName(APP_NAME)
-    QCoreApplication.setOrganizationDomain("io.github.myuto2490")
+    QCoreApplication.setOrganizationDomain("myuto2490.github.io")
     QCoreApplication.setApplicationName(APP_NAME)
     QCoreApplication.setApplicationVersion(__version__)
     QGuiApplication.setHighDpiScaleFactorRoundingPolicy(
