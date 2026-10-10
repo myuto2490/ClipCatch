@@ -1,0 +1,129 @@
+name: Release
+
+# v で始まるタグ（例: v1.0.0）を push すると、各 OS 向けの配布物を作って
+# 下書きのリリースに添付する。内容を確認してから GitHub 上で公開する。
+# 手動実行（workflow_dispatch）では配布物を作って Artifacts に置くだけ。
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS Apple Silicon
+            os: macos-14
+          - name: macOS Intel
+            os: macos-15-intel
+          - name: Windows x64
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    env:
+      # 署名・公証は任意。Secrets が無ければ ad-hoc 署名の配布物になる。
+      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check that the tag matches the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          version=$(python -c "import re;print(re.search(r'__version__ = \"(.+)\"', open('src/clipcatch/__init__.py').read()).group(1))")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match __version__ $version"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -e ".[dev]"
+
+      - name: Run tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: pytest -q
+
+      - name: Import the signing certificate (macOS)
+        if: runner.os == 'macOS' && env.MACOS_CERTIFICATE != ''
+        run: |
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password="$(uuidgen)"
+          echo "$MACOS_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          security import "$RUNNER_TEMP/certificate.p12" -P "$MACOS_CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple: -k "$password" "$keychain"
+          security list-keychains -d user -s "$keychain" login.keychain
+
+      - name: Store notarization credentials (macOS)
+        if: runner.os == 'macOS' && env.APPLE_ID != ''
+        run: |
+          xcrun notarytool store-credentials clipcatch \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
+          echo "MACOS_NOTARY_PROFILE=clipcatch" >> "$GITHUB_ENV"
+
+      - name: Install Inno Setup (Windows)
+        if: runner.os == 'Windows'
+        run: choco install innosetup -y --no-progress
+
+      - name: Build
+        run: python packaging/build.py --self-test
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ClipCatch-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            dist/*.dmg
+            dist/*.zip
+            dist/*-Setup.exe
+            dist/SHA256SUMS-*.txt
+          if-no-files-found: error
+
+  release:
+    name: Draft release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+
+      - name: Combine checksums
+        run: cat assets/SHA256SUMS-*.txt > assets/SHA256SUMS.txt && rm assets/SHA256SUMS-*.txt
+
+      - name: Create a draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="$(awk -v tag="${GITHUB_REF_NAME#v}" '
+            $0 ~ "^## \\[" tag "\\]" {found=1; next}
+            found && /^## \[/ {exit}
+            found {print}
+          ' CHANGELOG.md)"
+          gh release create "$GITHUB_REF_NAME" assets/* \
+            --draft \
+            --title "ClipCatch $GITHUB_REF_NAME" \
+            --notes "${notes:-See CHANGELOG.md}"

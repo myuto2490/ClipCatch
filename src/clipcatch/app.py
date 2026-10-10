@@ -10,6 +10,30 @@ from clipcatch import APP_NAME, __version__
 from clipcatch.core import i18n
 
 
+def self_test(app: QApplication, window) -> int:
+    """配布物が正しく組み上がっているかを確かめて終了する（CI 用）。
+
+    TLS のプラグイン・SVG の描画・アイコンが同梱されていないと、起動はしても
+    ダウンロードやアイコン表示が失敗するため、ここでまとめて確認する。
+    """
+    from PySide6.QtNetwork import QSslSocket
+
+    from clipcatch.ui import theme
+    from clipcatch.ui.resources import app_icon
+
+    checks = {
+        "tls": QSslSocket.supportsSsl(),
+        "svg": not theme.pixmap("link", "#000000", 16).isNull(),
+        "icon": not app_icon().isNull(),
+        "window": window.isVisible(),
+    }
+    for name, ok in checks.items():
+        print(f"{name}: {'ok' if ok else 'FAILED'}", flush=True)
+    window.close()
+    app.processEvents()
+    return 0 if all(checks.values()) else 1
+
+
 def run(argv: list[str]) -> int:
     QCoreApplication.setOrganizationName(APP_NAME)
     QCoreApplication.setOrganizationDomain("io.github.myuto2490")
@@ -49,6 +73,9 @@ def run(argv: list[str]) -> int:
     def on_state(state: Qt.ApplicationState) -> None:
         if state == Qt.ApplicationState.ApplicationActive:
             controller.auto_paste_if_appropriate()
+
+    if "--self-test" in argv:
+        return self_test(app, window)
 
     app.applicationStateChanged.connect(on_state)
     # 起動直後のセットアップはウインドウを描いてから始める
