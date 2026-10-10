@@ -53,7 +53,6 @@ class Palette:
     green: str
     orange: str
     red: str
-    shadow: str
 
     def color(self, name: str, alpha: float | None = None) -> QColor:
         color = QColor(getattr(self, name))
@@ -83,7 +82,6 @@ def _light(accent: str) -> Palette:
         green="#28A745",
         orange="#F08A00",
         red="#E5383B",
-        shadow="#000000",
     )
 
 
@@ -108,7 +106,6 @@ def _dark(accent: str) -> Palette:
         green="#30D158",
         orange="#FF9F0A",
         red="#FF453A",
-        shadow="#000000",
     )
 
 
@@ -531,11 +528,6 @@ def bind_icon(widget, name: str, color: str = "label", size: int = 18) -> None:
 
 def icon_size(size: int = 18) -> QSize:
     return QSize(size, size)
-
-
-def set_font_weight(font: QFont, weight: QFont.Weight) -> QFont:
-    font.setWeight(weight)
-    return font
 
 
 def configure_application_font(app: QApplication) -> None:
