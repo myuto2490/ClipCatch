@@ -19,13 +19,17 @@ def self_test(app: QApplication, window) -> int:
     from PySide6.QtNetwork import QSslSocket
 
     from clipcatch.ui import theme
-    from clipcatch.ui.resources import app_icon
+    from clipcatch.ui.resources import app_icon, licenses_directory
 
+    licenses = licenses_directory()
     checks = {
         "tls": QSslSocket.supportsSsl(),
         "svg": not theme.pixmap("link", "#000000", 16).isNull(),
         "icon": not app_icon().isNull(),
         "window": window.isVisible(),
+        # LGPL の全文など、配布物に必ず含めるべき文書
+        "licenses": licenses is not None
+        and all((licenses / n).exists() for n in ("LGPL-3.0-only.txt", "GPL-3.0-only.txt")),
     }
     for name, ok in checks.items():
         print(f"{name}: {'ok' if ok else 'FAILED'}", flush=True)

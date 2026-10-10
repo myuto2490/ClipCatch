@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from functools import cache
 from pathlib import Path
 
@@ -18,3 +19,12 @@ def app_icon() -> QIcon:
         if path.exists():
             icon.addFile(str(path))
     return icon
+
+
+def licenses_directory() -> Path | None:
+    """同梱したライセンス文書の場所。ソースから動かしているときはリポジトリの直下。"""
+    if getattr(sys, "frozen", False):
+        candidate = Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent)) / "licenses"
+    else:
+        candidate = ASSETS.parent.parent.parent / "LICENSES"
+    return candidate if candidate.is_dir() else None
