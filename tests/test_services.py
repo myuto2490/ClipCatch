@@ -163,6 +163,15 @@ class TestSettings:
         assert settings.format is DownloadFormat.MP4
         assert settings.auto_paste_url is False
 
+    def test_language(self, settings):
+        assert settings.language == "system"
+        settings.language = "en"
+        assert settings.language == "en"
+        settings.language = "fr"
+        assert settings.language == "system"
+        settings._store.setValue("language", "xx")
+        assert settings.language == "system"
+
     def test_unknown_flag(self, settings):
         with pytest.raises(KeyError):
             settings.set_flag("nope", True)

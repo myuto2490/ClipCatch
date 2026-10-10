@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QApplication,
     QComboBox,
     QDialog,
     QHBoxLayout,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QVBoxLayout,
@@ -17,6 +19,7 @@ from clipcatch.controller import AppController
 from clipcatch.core.formats import CookieBrowser
 from clipcatch.core.i18n import tr
 from clipcatch.core.platform import IS_MACOS
+from clipcatch.services import system
 from clipcatch.services.toolchain import ToolState
 from clipcatch.ui.tools_menu import describe
 from clipcatch.ui.widgets import Card, Switch, label, section_header
@@ -82,6 +85,31 @@ class SettingsWindow(QDialog):
             )
         )
         body.addWidget(general)
+
+        body.addSpacing(10)
+        body.addWidget(section_header(tr("言語", "Language")))
+        language_card = Card()
+        self.language = QComboBox()
+        # 言語名はその言語自身で書く（読めない言語に切り替えても戻せるように）
+        for value, title in (
+            ("system", tr("システムに合わせる", "Match System")),
+            ("ja", "日本語"),
+            ("en", "English"),
+        ):
+            self.language.addItem(title, value)
+        self.language.setCurrentIndex(max(self.language.findData(self.settings.language), 0))
+        self.language.currentIndexChanged.connect(self._language_changed)
+        language_card.add_row(
+            _row(
+                tr("表示する言語", "Display language"),
+                tr(
+                    "変更は ClipCatch の再起動後に反映されます。",
+                    "Takes effect after ClipCatch restarts.",
+                ),
+                self.language,
+            )
+        )
+        body.addWidget(language_card)
 
         body.addSpacing(10)
         body.addWidget(section_header(tr("ダウンロード", "Downloads")))
@@ -188,6 +216,35 @@ class SettingsWindow(QDialog):
         switch.toggled.connect(lambda value: self.settings.set_flag(key, value))
         return switch
 
+    def _language_changed(self, index: int) -> None:
+        self.settings.language = self.language.itemData(index)
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Information)
+        box.setText(tr("言語を変更しました", "Language changed"))
+        box.setInformativeText(
+            tr(
+                "新しい言語は ClipCatch を再起動すると反映されます。",
+                "The new language will be used after ClipCatch restarts.",
+            )
+        )
+        restart = box.addButton(
+            tr("今すぐ再起動", "Restart Now"), QMessageBox.ButtonRole.AcceptRole
+        )
+        box.addButton(tr("あとで", "Later"), QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(restart)
+        restart.setEnabled(not self.controller.phase.is_busy)
+        box.exec()
+        if box.clickedButton() is restart:
+            self._restart()
+
+    def _restart(self) -> None:
+        """メインウインドウを閉じられたら（ダウンロードの確認を通ったら）起動し直す。"""
+        window = self.parentWidget()
+        if window is not None and not window.close():
+            return
+        if system.relaunch():
+            QApplication.quit()
+
     def _cookie_changed(self, index: int) -> None:
         self.settings.cookie_browser = self.cookies.itemData(index)
 
@@ -199,7 +256,8 @@ class SettingsWindow(QDialog):
             "Not installed (built-in downloader is used)",
         )
         self.aria2_status.setText(describe(aria2, missing))
-        self.aria2_install.setVisible(not aria2.ready and tc.can_install_aria2c)
+        checking = aria2.state in (ToolState.UNKNOWN, ToolState.CHECKING)
+        self.aria2_install.setVisible(not aria2.ready and not checking and tc.can_install_aria2c)
         self.aria2_install.setEnabled(not aria2.state.is_busy)
         self.aria2_row.setEnabled(self.settings.accelerate_with_aria2c)
 
