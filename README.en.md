@@ -25,6 +25,8 @@
   </picture>
 </p>
 
+See the [**Wiki**](https://github.com/myuto2490/ClipCatch/wiki/English) for detailed guides and troubleshooting.
+
 ## Features
 
 - **See what you'll get first** — paste a URL and a card shows the thumbnail, title, uploader and duration
