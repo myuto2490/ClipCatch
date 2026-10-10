@@ -173,7 +173,7 @@ Developer ID で署名・公証する場合は `MACOS_SIGN_IDENTITY` と `MACOS_
 ### リリース
 
 1. `src/clipcatch/__init__.py` の `__version__` と [CHANGELOG.md](CHANGELOG.md) を更新する
-2. `v<バージョン>` のタグを push する（例: `git tag v1.0.0 && git push origin v1.0.0`）
+2. `v<バージョン>` のタグを push する（例: `git tag v0.1.0 && git push origin v0.1.0`）
 3. GitHub Actions が Apple シリコン・Intel・Windows 向けの配布物を作り、**下書きのリリース**に添付する
 4. 内容を確認して公開する
 

@@ -1,6 +1,6 @@
 name: Release
 
-# v で始まるタグ（例: v1.0.0）を push すると、各 OS 向けの配布物を作って
+# v で始まるタグ（例: v0.1.0）を push すると、各 OS 向けの配布物を作って
 # 下書きのリリースに添付する。内容を確認してから GitHub 上で公開する。
 # 手動実行（workflow_dispatch）では配布物を作って Artifacts に置くだけ。
 on:

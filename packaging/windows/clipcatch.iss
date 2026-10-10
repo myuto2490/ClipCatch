@@ -1,6 +1,6 @@
 ; ClipCatch の Windows インストーラ（Inno Setup 6）。
 ; packaging/build.py から次の定数を渡して使う:
-;   AppVersion  バージョン（例: 1.0.0）
+;   AppVersion  バージョン（例: 0.1.0）
 ;   SourceDir   PyInstaller が作った dist\ClipCatch フォルダ
 ;   OutputDir   出力先
 ;   OutputName  出力ファイル名（拡張子なし）

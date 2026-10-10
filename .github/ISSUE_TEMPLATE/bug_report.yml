@@ -29,7 +29,7 @@ body:
     attributes:
       label: ClipCatch のバージョン / ClipCatch version
       description: 「ClipCatch について」に表示されます / Shown in About ClipCatch
-      placeholder: "1.0.0"
+      placeholder: "0.1.0"
     validations:
       required: true
   - type: dropdown
