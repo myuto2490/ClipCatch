@@ -11,7 +11,6 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 from clipcatch.core.formats import CookieBrowser, DownloadFormat, VideoQuality
 from clipcatch.core.i18n import tr
@@ -382,11 +381,3 @@ class OutputParser:
         else:
             events.append(LogEvent(line, LogLevel.DETAIL))
         return events
-
-
-def decode_json_object(text: str) -> dict[str, Any] | None:
-    try:
-        value = json.loads(text)
-    except (json.JSONDecodeError, TypeError):
-        return None
-    return value if isinstance(value, dict) else None

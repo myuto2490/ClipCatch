@@ -160,10 +160,6 @@ class SegmentedControl(QWidget):
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setAccessibleName(" / ".join(items))
 
-    def set_items(self, items: list[str]) -> None:
-        self._items = items
-        self.update()
-
     def current_index(self) -> int:
         return self._index
 
