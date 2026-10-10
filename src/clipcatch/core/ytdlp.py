@@ -41,11 +41,15 @@ class DownloadRequest:
     # `~/.config/yt-dlp/config` などの個人設定を読ませるか。
     use_user_config: bool = False
     allow_playlist: bool = False
+    # YouTube の解析に使う Deno。無いと一部の形式が取れないことがある。
+    js_runtime: Path | None = None
 
 
-def common_arguments() -> list[str]:
+def common_arguments(js_runtime: Path | None = None) -> list[str]:
     """どの呼び出しにも付ける引数。"""
     args = ["--no-colors"]
+    if js_runtime is not None:
+        args += ["--js-runtimes", f"deno:{js_runtime}"]
     if IS_WINDOWS:
         # パイプ越しだとコンソールのコードページ（cp932 など）で出力されるため
         args += ["--encoding", "utf-8"]
@@ -82,7 +86,7 @@ def download_arguments(request: DownloadRequest) -> list[str]:
         "--progress",  # quiet でも進捗を出させる
         "--no-quiet",
         "--no-simulate",
-        *common_arguments(),
+        *common_arguments(request.js_runtime),
         "--progress-template",
         progress_template,
         "--print",
@@ -131,14 +135,16 @@ def download_arguments(request: DownloadRequest) -> list[str]:
     return args
 
 
-def metadata_arguments(url: str, allow_playlist: bool = False) -> list[str]:
+def metadata_arguments(
+    url: str, allow_playlist: bool = False, js_runtime: Path | None = None
+) -> list[str]:
     return [
         "-J",
         # プレイリストは中身を 1 本ずつ解析すると遅いので、一覧だけを取る
         "--flat-playlist" if allow_playlist else "--no-playlist",
         "--no-warnings",
         "--ignore-config",
-        *common_arguments(),
+        *common_arguments(js_runtime),
         "--socket-timeout",
         "15",
         "--",
@@ -266,6 +272,8 @@ def parse_result(line: str) -> DownloadResult:
     )
 
 
+# aria2c が 1 秒ごとに出す要約の飾り行。進捗はこの中の `[#...]` 行から読む。
+_ARIA2_NOISE = re.compile(r"^(\*\*\* Download Progress Summary|FILE: |[=-]{20,}$)")
 _ARIA2_FULL = re.compile(r"\[#\S+\s+([0-9.]+[A-Za-z]+)/([0-9.]+[A-Za-z]+)\((\d+)%\)")
 _ARIA2_PARTIAL = re.compile(r"\[#\S+\s+([0-9.]+[A-Za-z]+)\s")
 _ARIA2_SPEED = re.compile(r"DL:([0-9.]+[A-Za-z]*)")
@@ -360,6 +368,8 @@ class OutputParser:
             return []
         if aria2 := parse_aria2_progress(line, self.current_file_name):
             return [ProgressEvent(aria2)]
+        if _ARIA2_NOISE.match(line):
+            return []
 
         events: list[Event] = []
         if label := stage_label(line):
