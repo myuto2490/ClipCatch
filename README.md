@@ -176,11 +176,17 @@ Developer ID で署名・公証する場合は `MACOS_SIGN_IDENTITY` と `MACOS_
 ### リリース
 
 1. `src/clipcatch/__init__.py` の `__version__` と [CHANGELOG.md](CHANGELOG.md) を更新する
-2. `v<バージョン>` のタグを push する（例: `git tag v0.1.0 && git push origin v0.1.0`）
-3. GitHub Actions が Apple シリコン・Intel・Windows 向けの配布物を作り、**下書きのリリース**に添付する
-4. 内容を確認して公開する
+2. `v<バージョン>` のタグを push する（例: `git tag -a v0.1.0 -m "ClipCatch 0.1.0" && git push origin v0.1.0`）
+3. GitHub Actions が Apple シリコン・Intel・Windows 向けの配布物を作り、起動確認が通ればリリースを公開する
 
-GitHub の Secrets に次を登録すると、macOS 版が Developer ID で署名・公証されます（任意）。
+リリースは所有者本人の名前で作るため、GitHub の自動トークンではなく所有者の個人用アクセストークンを使います。
+事前に次の Secret を登録してください（必須）。トークンの持ち主がリポジトリの所有者でなければ、リリースは作られません。
+
+| Secret | 内容 |
+| --- | --- |
+| `RELEASE_TOKEN` | 所有者の Fine-grained personal access token（このリポジトリのみ、Contents: Read and write） |
+
+次を登録すると、macOS 版が Developer ID で署名・公証されます（任意）。
 
 | Secret | 内容 |
 | --- | --- |
