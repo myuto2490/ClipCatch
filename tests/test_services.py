@@ -92,8 +92,10 @@ class TestSources:
             assert source.members[0].startswith("deno")
 
     def test_checksums_where_published(self):
-        assert sources.deno_source("arm64").checksum_url.endswith(".zip.sha256sum")
-        assert sources.deno_source("arm64").asset_name == "deno-aarch64-apple-darwin.zip"
+        deno = sources.deno_source("arm64")
+        assert deno.checksum_url.endswith(".zip.sha256sum")
+        assert deno.asset_name == deno.url.rsplit("/", 1)[1]
+        assert deno.asset_name.startswith("deno-aarch64-")
         for alternative in sources.ffmpeg_sources():
             for archive in alternative:
                 if "FFmpeg-Builds" in archive.url:

@@ -140,8 +140,8 @@ def build_macos() -> list[Path]:
 def build_windows() -> list[Path]:
     folder = DIST / APP_NAME
     portable = DIST / f"{APP_NAME}-{version()}-Windows-{arch()}"
-    shutil.make_archive(str(portable), "zip", DIST, APP_NAME)
-    outputs = [portable.with_suffix(".zip")]
+    # with_suffix は「.0-Windows-x64」を拡張子とみなすため、作られたパスをそのまま使う
+    outputs = [Path(shutil.make_archive(str(portable), "zip", DIST, APP_NAME))]
 
     iscc = shutil.which("iscc") or next(
         (
@@ -181,7 +181,12 @@ def self_test() -> None:
         executable = DIST / APP_NAME / APP_NAME
     env = dict(os.environ, QT_QPA_PLATFORM="offscreen")
     result = subprocess.run(
-        [str(executable), "--self-test"], env=env, capture_output=True, text=True, timeout=120
+        [str(executable), "--self-test"],
+        env=env,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=120,
     )
     print(result.stdout + result.stderr)
     if result.returncode != 0:
@@ -200,6 +205,9 @@ def write_checksums(files: list[Path]) -> None:
 
 
 def main() -> None:
+    # Windows の既定の文字コード（cp1252）では「▸」や日本語を出力できない
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
     DIST.mkdir(exist_ok=True)
     pyinstaller()
     if "--self-test" in sys.argv:
