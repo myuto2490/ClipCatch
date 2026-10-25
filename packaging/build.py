@@ -200,7 +200,8 @@ def write_checksums(files: list[Path]) -> None:
         digest = hashlib.sha256(file.read_bytes()).hexdigest()
         lines.append(f"{digest}  {file.name}")
     checksum = DIST / f"SHA256SUMS-{platform.system()}-{arch()}.txt"
-    checksum.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Windows でも LF で書き、各 OS の一覧をつなげたまま `shasum -c` で照合できるようにする
+    checksum.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print(checksum.read_text(encoding="utf-8"))
 
 
