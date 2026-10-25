@@ -1,7 +1,8 @@
 name: Release
 
-# v で始まるタグ（例: v0.1.0）を push すると、各 OS 向けの配布物を作って
-# 下書きのリリースに添付する。内容を確認してから GitHub 上で公開する。
+# v で始まるタグ（例: v0.1.0）を push すると、各 OS 向けの配布物を作ってリリースを公開する。
+# リリースの作成者を所有者本人にするため、GitHub の自動トークンではなく
+# 所有者の個人用アクセストークン（Secret: RELEASE_TOKEN）でリリースを作る。
 # 手動実行（workflow_dispatch）では配布物を作って Artifacts に置くだけ。
 on:
   push:
@@ -97,13 +98,27 @@ jobs:
           if-no-files-found: error
 
   release:
-    name: Draft release
+    name: Publish release
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+    env:
+      GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
     steps:
+      - name: Check that the release is made by the repository owner
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Secret RELEASE_TOKEN is not set. Add a personal access token of ${{ github.repository_owner }} (Contents: read and write)."
+            exit 1
+          fi
+          login="$(gh api user --jq .login)"
+          if [ "$login" != "${{ github.repository_owner }}" ]; then
+            echo "::error::RELEASE_TOKEN belongs to '$login', not '${{ github.repository_owner }}'."
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
       - uses: actions/download-artifact@v4
@@ -114,9 +129,7 @@ jobs:
       - name: Combine checksums
         run: cat assets/SHA256SUMS-*.txt > assets/SHA256SUMS.txt && rm assets/SHA256SUMS-*.txt
 
-      - name: Create a draft release
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Publish the release
         run: |
           notes="$(awk -v tag="${GITHUB_REF_NAME#v}" '
             $0 ~ "^## \\[" tag "\\]" {found=1; next}
@@ -124,6 +137,7 @@ jobs:
             found {print}
           ' CHANGELOG.md)"
           gh release create "$GITHUB_REF_NAME" assets/* \
-            --draft \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
             --title "ClipCatch $GITHUB_REF_NAME" \
             --notes "${notes:-See CHANGELOG.md}"
