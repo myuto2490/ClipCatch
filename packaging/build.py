@@ -140,8 +140,8 @@ def build_macos() -> list[Path]:
 def build_windows() -> list[Path]:
     folder = DIST / APP_NAME
     portable = DIST / f"{APP_NAME}-{version()}-Windows-{arch()}"
-    shutil.make_archive(str(portable), "zip", DIST, APP_NAME)
-    outputs = [portable.with_suffix(".zip")]
+    # with_suffix は「.0-Windows-x64」を拡張子とみなすため、作られたパスをそのまま使う
+    outputs = [Path(shutil.make_archive(str(portable), "zip", DIST, APP_NAME))]
 
     iscc = shutil.which("iscc") or next(
         (
